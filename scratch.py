@@ -8,6 +8,9 @@ WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
+PURPLE = (255, 0, 255)
+YELLOW = (255, 255, 0)
+CYAN = (0, 255, 255)
 
 # Screen dimensions
 SCREEN_WIDTH = 800
@@ -28,12 +31,12 @@ class Player(pygame.sprite.Sprite):
 
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
-        width = 40
-        height = 60
+        width = 20
+        height = 50
         self.image = pygame.Surface([width, height])
-        self.image.fill(RED)
+        self.image.fill(WHITE)
 
-        # Set a referance to the image rect.
+        # Set a reference to the image rect.
         self.rect = self.image.get_rect()
 
         # Set speed vector of player
@@ -128,7 +131,7 @@ class Platform(pygame.sprite.Sprite):
         super().__init__()
 
         self.image = pygame.Surface([width, height])
-        self.image.fill(GREEN)
+        self.image.fill(WHITE)
 
         self.rect = self.image.get_rect()
 
@@ -148,7 +151,7 @@ class Level():
         # How far this world has been scrolled left/right
         self.world_shift = 0
 
-    # Update everythign on this level
+    # Update everything on this level
     def update(self):
         """ Update everything in this level."""
         self.platform_list.update()
@@ -158,7 +161,7 @@ class Level():
         """ Draw everything on this level. """
 
         # Draw the background
-        screen.fill(BLUE)
+        screen.fill(BLACK)
 
         # Draw all the sprite lists that we have
         self.platform_list.draw(screen)
