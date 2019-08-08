@@ -1,4 +1,5 @@
 import pygame
+import socket
 
 # Global constants
 
@@ -15,6 +16,9 @@ CYAN = (0, 255, 255)
 # Screen dimensions
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
+
+HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
+PORT = 65433        # Port to listen on (non-privileged ports are > 1023)
 
 class Player(pygame.sprite.Sprite):
     """
@@ -194,16 +198,28 @@ class Level_01(Level):
         self.level_limit = -1000
 
         # Array with width, height, x, and y of platform
-        level = [[2800, 50, 0, 0],
-                 [100, 20, 100, 100], [20, 80, 100, 120], [80, 20, 120, 180], [20, 80, 180, 200], [80, 20, 100, 260],
-                 [100, 20, 220, 100], [20, 160, 260, 120],
-                 [100, 20, 340, 100], [20, 160, 340, 120], [20, 160, 420, 120], [60, 20, 360, 180],
-                 [100, 20, 460, 100], [20, 160, 460, 120], [80, 20, 480, 180], [20, 60, 540, 120], [20, 60, 520, 200], [40, 20, 520, 260],
-                 [100, 20, 580, 100], [20, 160, 620, 120],
-                 [50, 600, 0, 0],
-                 [400, 50, 50, 550], [600, 100, 600, 500], [800, 50, 1400, 550],
-                 [50, 50, 950, 50], [50, 50, 1300, 50], [50, 50, 1550, 0], [50, 50, 1800, 50]
-                 ]
+        level = []
+        for i in range(2800//50):
+            level.append([50,50, 50*i, 0])
+        for i in range(600//50):
+            level.append([50,50,0, 50*i])
+        for i in range(400//50):
+            level.append([50, 50, 50+50*i, 550])
+        for i in range(2):
+            for j in range(600//50):
+                level.append([50,50,600+50*j, 500+ 50*i])
+        for i in range(800//50):
+            level.append([50,50,1400+50*i,550])
+        level.append([50, 50, 950, 50])
+        level.append([50, 50, 1300, 50])
+        level.append([50, 50, 1550, 50])
+        level.append([50, 50, 1800, 50])
+
+        # level = [[2800, 50, 0, 0],
+        #          [50, 600, 0, 0],
+        #          [400, 50, 50, 550], [600, 100, 600, 500], [800, 50, 1400, 550],
+        #          [50, 50, 950, 50], [50, 50, 1300, 50], [50, 50, 1550, 0], [50, 50, 1800, 50]
+        #          ]
 
         # Go through the array above and add platforms
         for platform in level:
@@ -227,10 +243,28 @@ class Level_02(Level):
         self.level_limit = -1000
 
         # Array with type of platform, and x, y location of the platform.
-        level = [[2800, 50, 0, 0],
-                 [400, 50, 50, 550], [600, 100, 600, 500], [800, 1500, 1400, 450],
-                 [50, 50, 500, 50], [50, 50, 950, 50], [50, 50, 1300, 50], [50, 50, 1550, 0], [50, 50, 1800, 50]
-                 ]
+        level = []
+        for i in range(2800 // 50):
+            level.append([50, 50, 50 * i, 0])
+        for i in range(600 // 50):
+            level.append([50, 50, 0, 50 * i])
+        for i in range(400 // 50):
+            level.append([50, 50, 50 + 50 * i, 550])
+        for i in range(2):
+            for j in range(600 // 50):
+                level.append([50, 50, 600 + 50 * j, 500 + 50 * i])
+        for i in range(3):
+            for j in range(800//50):
+                level.append([50,50,1400+50*j,450+50*i])
+        level.append([50, 50, 950, 50])
+        level.append([50, 50, 1300, 50])
+        level.append([50, 50, 1550, 50])
+        level.append([50, 50, 1800, 50])
+
+        # level = [[2800, 50, 0, 0],
+        #          [400, 50, 50, 550], [600, 100, 600, 500], [800, 1500, 1400, 450],
+        #          [50, 50, 500, 50], [50, 50, 950, 50], [50, 50, 1300, 50], [50, 50, 1550, 0], [50, 50, 1800, 50]
+        #          ]
 
         # Go through the array above and add platforms
         for platform in level:
@@ -279,7 +313,7 @@ def main():
 
 
 
-    #gameImg = pygame.image.load('insertimagehere.png')
+    # gameImg = pygame.image.load('insertimagehere.png')
 
     def image():
         gameDisplay.blit(gameImg, (0, 0))
@@ -332,7 +366,27 @@ def main():
                 current_level = level_list[current_level_no]
                 player.level = current_level
 
+
+        # #NETWORKING STUFF BELOW
+        # #sends the sprite positions
+        # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        #     s.connect((HOST, PORT))
+        #
+        # #recivces the rendered image
+        # myfile = open("render.bmp", "wb+")
+        # while True:
+        #     data = s.recv(4096)
+        #     if not data:
+        #         print("end of received transmission")
+        #         break
+        #     else:
+        #         # received = received + str(data)
+        #         myfile.write(data)
+        #
+        # #NETWORKING STUFF ABOVE
+
         # ALL CODE TO DRAW SHOULD GO BELOW THIS COMMENT
+
         current_level.draw(screen)
         active_sprite_list.draw(screen)
         #gameDisplay.fill(WHITE)
