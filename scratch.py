@@ -18,7 +18,64 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
-PORT = 65433        # Port to listen on (non-privileged ports are > 1023)
+PORT = 65432        # Port to listen on (non-privileged ports are > 1023)
+
+def send_level(level):
+
+    str_walls = ''
+    str_stalactites = ''
+    for e in level.walls:
+        str_walls = str_walls + str(e[0]) + ","
+        str_walls = str_walls + str(e[1]) + ","
+    for e in level.stalactites:
+        str_stalactites = str_stalactites + str(e[0]) + ","
+        str_stalactites = str_stalactites + str(e[1]) + ","
+
+    #send the walls,
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((HOST, PORT))
+    s.sendall(str_walls.encode())
+    s.close()
+
+    #send the stalactites
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((HOST, PORT))
+    s.sendall(str_stalactites.encode())
+    s.close()
+
+def send_update(str_x, str_y, should_send_level, level):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((HOST, PORT))
+    message = str_x +',' + str_y + ',' + str(should_send_level)
+    s.sendall(message.encode())
+    s.close()
+
+    if should_send_level == True:
+        send_level(level)
+
+def recv_render():
+    # try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((HOST, PORT))
+        myfile = open("render.bmp", "wb")
+        # received = ''
+        while True:
+            # print('started trying to recive')
+            data = s.recv(4096)
+            # print('recved')
+            if not data:
+                # print("end of received transmission")
+                break
+            else:
+                # print(data)
+                # received = received + str(data)
+                myfile.write(data)
+            # print("looping")
+    # finally:
+    #     print('asdfasdfasdfasdfasdf')
+
+
+
 
 class Player(pygame.sprite.Sprite):
     """
@@ -196,24 +253,37 @@ class Level_01(Level):
         Level.__init__(self, player)
 
         self.level_limit = -1000
+        self.walls = []
+        self.stalactites = []
 
         # Array with width, height, x, and y of platform
         level = []
         for i in range(2800//50):
             level.append([50,50, 50*i, 0])
+            self.walls.append([50*i, 0])
         for i in range(600//50):
             level.append([50,50,0, 50*i])
+            self.walls.append([0, 50*i])
         for i in range(400//50):
             level.append([50, 50, 50+50*i, 550])
+            self.walls.append([50+50*i, 550])
         for i in range(2):
             for j in range(600//50):
                 level.append([50,50,600+50*j, 500+ 50*i])
+                self.walls.append([600+50*j, 500+ 50*i])
         for i in range(800//50):
             level.append([50,50,1400+50*i,550])
+            self.walls.append([1400+50*i,550])
         level.append([50, 50, 950, 50])
+        self.stalactites.append([950, 50])
         level.append([50, 50, 1300, 50])
+        self.stalactites.append([1300, 50])
         level.append([50, 50, 1550, 50])
+        self.stalactites.append([1550, 50])
         level.append([50, 50, 1800, 50])
+        self.stalactites.append([1800, 50])
+
+
 
         # level = [[2800, 50, 0, 0],
         #          [50, 600, 0, 0],
@@ -241,25 +311,36 @@ class Level_02(Level):
         Level.__init__(self, player)
 
         self.level_limit = -1000
+        self.walls = []
+        self.stalactites = []
 
-        # Array with type of platform, and x, y location of the platform.
         level = []
+        # Array with type of platform, and x, y location of the platform.
         for i in range(2800 // 50):
             level.append([50, 50, 50 * i, 0])
+            self.walls.append([50 * i, 0])
         for i in range(600 // 50):
             level.append([50, 50, 0, 50 * i])
+            self.walls.append([0, 50 * i])
         for i in range(400 // 50):
             level.append([50, 50, 50 + 50 * i, 550])
+            self.walls.append([50 + 50 * i, 550])
         for i in range(2):
             for j in range(600 // 50):
                 level.append([50, 50, 600 + 50 * j, 500 + 50 * i])
+                self.walls.append([600 + 50 * j, 500 + 50 * i])
         for i in range(3):
             for j in range(800//50):
                 level.append([50,50,1400+50*j,450+50*i])
+                self.walls.append([1400+50*j,450+50*i])
         level.append([50, 50, 950, 50])
+        self.stalactites.append([950, 50])
         level.append([50, 50, 1300, 50])
+        self.stalactites.append([1300, 50])
         level.append([50, 50, 1550, 50])
+        self.stalactites.append([1550, 50])
         level.append([50, 50, 1800, 50])
+        self.stalactites.append([1800, 50])
 
         # level = [[2800, 50, 0, 0],
         #          [400, 50, 50, 550], [600, 100, 600, 500], [800, 1500, 1400, 450],
@@ -315,11 +396,14 @@ def main():
 
     # gameImg = pygame.image.load('insertimagehere.png')
 
-    def image():
-        gameDisplay.blit(gameImg, (0, 0))
+    def image(display):
+        gameImg = pygame.image.load('render.bmp')
+        display.blit(gameImg, (0, 0))
 
 
     # -------- Main Program Loop -----------
+    should_send_level = True
+
     while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -365,9 +449,20 @@ def main():
                 current_level_no += 1
                 current_level = level_list[current_level_no]
                 player.level = current_level
+                should_send_level = True
 
 
         # #NETWORKING STUFF BELOW
+
+        playerx = str(player.rect.x)
+        playery = str(player.rect.y)
+
+        # should_send_level = False
+        send_update(playerx, playery, should_send_level, current_level)
+        should_send_level = False
+
+        recv_render()
+
         # #sends the sprite positions
         # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         #     s.connect((HOST, PORT))
@@ -383,14 +478,18 @@ def main():
         #         # received = received + str(data)
         #         myfile.write(data)
         #
+
+
         # #NETWORKING STUFF ABOVE
 
         # ALL CODE TO DRAW SHOULD GO BELOW THIS COMMENT
 
-        current_level.draw(screen)
-        active_sprite_list.draw(screen)
+        # current_level.draw(screen)
+        # active_sprite_list.draw(screen)
         #gameDisplay.fill(WHITE)
         #image()
+        image(gameDisplay)
+
 
         # ALL CODE TO DRAW SHOULD GO ABOVE THIS COMMENT
 
