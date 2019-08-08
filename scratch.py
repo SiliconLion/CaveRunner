@@ -16,7 +16,6 @@ CYAN = (0, 255, 255)
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-
 class Player(pygame.sprite.Sprite):
     """
     This class represents the bar at the bottom that the player controls.
@@ -31,7 +30,7 @@ class Player(pygame.sprite.Sprite):
 
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
-        width = 20
+        width = 50
         height = 50
         self.image = pygame.Surface([width, height])
         self.image.fill(WHITE)
@@ -195,10 +194,15 @@ class Level_01(Level):
         self.level_limit = -1000
 
         # Array with width, height, x, and y of platform
-        level = [[210, 70, 500, 500],
-                 [210, 70, 800, 400],
-                 [210, 70, 1000, 500],
-                 [210, 70, 1120, 280],
+        level = [[2800, 50, 0, 0],
+                 [100, 20, 100, 100], [20, 80, 100, 120], [80, 20, 120, 180], [20, 80, 180, 200], [80, 20, 100, 260],
+                 [100, 20, 220, 100], [20, 160, 260, 120],
+                 [100, 20, 340, 100], [20, 160, 340, 120], [20, 160, 420, 120], [60, 20, 360, 180],
+                 [100, 20, 460, 100], [20, 160, 460, 120], [80, 20, 480, 180], [20, 60, 540, 120], [20, 60, 520, 200], [40, 20, 520, 260],
+                 [100, 20, 580, 100], [20, 160, 620, 120],
+                 [50, 600, 0, 0],
+                 [400, 50, 50, 550], [600, 100, 600, 500], [800, 50, 1400, 550],
+                 [50, 50, 950, 50], [50, 50, 1300, 50], [50, 50, 1550, 0], [50, 50, 1800, 50]
                  ]
 
         # Go through the array above and add platforms
@@ -223,10 +227,9 @@ class Level_02(Level):
         self.level_limit = -1000
 
         # Array with type of platform, and x, y location of the platform.
-        level = [[210, 30, 450, 570],
-                 [210, 30, 850, 420],
-                 [210, 30, 1000, 520],
-                 [210, 30, 1120, 280],
+        level = [[2800, 50, 0, 0],
+                 [400, 50, 50, 550], [600, 100, 600, 500], [800, 1500, 1400, 450],
+                 [50, 50, 500, 50], [50, 50, 950, 50], [50, 50, 1300, 50], [50, 50, 1550, 0], [50, 50, 1800, 50]
                  ]
 
         # Go through the array above and add platforms
@@ -246,7 +249,7 @@ def main():
     size = [SCREEN_WIDTH, SCREEN_HEIGHT]
     screen = pygame.display.set_mode(size)
 
-    pygame.display.set_caption("Side-scrolling Platformer")
+    pygame.display.set_caption("Cave Runner")
 
     # Create the player
     player = Player()
@@ -263,8 +266,8 @@ def main():
     active_sprite_list = pygame.sprite.Group()
     player.level = current_level
 
-    player.rect.x = 340
-    player.rect.y = SCREEN_HEIGHT - player.rect.height
+    player.rect.x = 200
+    player.rect.y = 500
     active_sprite_list.add(player)
 
     # Loop until the user clicks the close button.
@@ -272,6 +275,15 @@ def main():
 
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
+    gameDisplay = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+
+
+    #gameImg = pygame.image.load('insertimagehere.png')
+
+    def image():
+        gameDisplay.blit(gameImg, (0, 0))
+
 
     # -------- Main Program Loop -----------
     while not done:
@@ -323,6 +335,8 @@ def main():
         # ALL CODE TO DRAW SHOULD GO BELOW THIS COMMENT
         current_level.draw(screen)
         active_sprite_list.draw(screen)
+        #gameDisplay.fill(WHITE)
+        #image()
 
         # ALL CODE TO DRAW SHOULD GO ABOVE THIS COMMENT
 
