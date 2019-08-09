@@ -252,7 +252,7 @@ class Level_01(Level):
         # Call the parent constructor
         Level.__init__(self, player)
 
-        self.level_limit = -1000
+        self.level_limit = 1874
         self.walls = []
         self.stalactites = []
 
@@ -310,7 +310,7 @@ class Level_02(Level):
         # Call the parent constructor
         Level.__init__(self, player)
 
-        self.level_limit = -1000
+        self.level_limit = 1874
         self.walls = []
         self.stalactites = []
 
@@ -430,20 +430,21 @@ def main():
         current_level.update()
 
         # If the player gets near the right side, shift the world left (-x)
-        if player.rect.right >= 500:
-            diff = player.rect.right - 500
-            player.rect.right = 500
-            current_level.shift_world(-diff)
+        # if player.rect.right >= 500:
+        #     diff = player.rect.right - 500
+        #     player.rect.right = 500
+        #     current_level.shift_world(-diff)
+        #
+        # # If the player gets near the left side, shift the world right (+x)
+        # if player.rect.left <= 120:
+        #     diff = 120 - player.rect.left
+        #     player.rect.left = 120
+        #     current_level.shift_world(diff)
 
-        # If the player gets near the left side, shift the world right (+x)
-        if player.rect.left <= 120:
-            diff = 120 - player.rect.left
-            player.rect.left = 120
-            current_level.shift_world(diff)
 
         # If the player gets to the end of the level, go to the next level
-        current_position = player.rect.x + current_level.world_shift
-        if current_position < current_level.level_limit:
+        current_position = player.rect.x
+        if current_position > current_level.level_limit:
             player.rect.x = 120
             if current_level_no < len(level_list) - 1:
                 current_level_no += 1
